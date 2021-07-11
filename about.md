@@ -12,4 +12,4 @@ A place to include any other types of information that you'd like to include abo
 
 ### Contact me
 
-[kevin1kevin1k@gmail.com](mailto:kevin1kevin1k@gmail.com)
+kevin1kevin1k AT gmail.com
