@@ -1,7 +1,6 @@
 ---
-layout: page
 title: About
-permalink: /about/
+description: About Yu-Sheng Li.
 ---
 
 My CV can be found [here](/assets/pdf/cv.pdf).

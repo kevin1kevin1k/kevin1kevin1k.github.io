@@ -1,3 +1,26 @@
-# Blog of Yu-Sheng Li
+# Yu-Sheng Li
 
-Forked from the great [Jekyll Now](https://github.com/barryclark/jekyll-now).
+Personal site built with [Astro](https://astro.build/) and deployed to GitHub Pages.
+
+## Development
+
+```sh
+npm install
+npm run dev
+```
+
+## Checks
+
+```sh
+npm run check
+npm run build
+npm run verify
+```
+
+`npm run verify` checks the generated `dist/` output for the core pages, migrated post URLs, legacy redirects, and static assets.
+
+## Content
+
+- Blog posts live in `src/content/blog/`.
+- Static pages live in `src/content/pages/`.
+- Public assets live in `public/` and are served from the site root.

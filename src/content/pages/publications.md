@@ -1,7 +1,6 @@
 ---
-layout: page
 title: Publications
-permalink: /publications/
+description: Selected publications by Yu-Sheng Li.
 ---
 
 
