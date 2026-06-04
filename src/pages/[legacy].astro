@@ -1,0 +1,32 @@
+---
+export function getStaticPaths() {
+  const redirects: Record<string, string> = {
+    "first-post": "/blog/first-post/",
+    "literature-survey-tool": "/blog/literature-survey-tool/",
+  };
+
+  return Object.entries(redirects).map(([legacy, target]) => ({
+    params: { legacy },
+    props: { target },
+  }));
+}
+
+interface Props {
+  target: string;
+}
+
+const { target } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <link rel="canonical" href={target} />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href={target}>{target}</a>.</p>
+  </body>
+</html>

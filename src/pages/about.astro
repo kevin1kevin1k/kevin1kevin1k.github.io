@@ -1,0 +1,15 @@
+---
+import { getCollection } from "astro:content";
+import MarkdownPageLayout from "../layouts/MarkdownPageLayout.astro";
+
+const pages = await getCollection("pages");
+const page = pages.find((entry) => entry.id.replace(/\.mdx?$/, "") === "about");
+if (!page) {
+  throw new Error("Missing about page content");
+}
+const { Content } = await page.render();
+---
+
+<MarkdownPageLayout title={page.data.title} description={page.data.description}>
+  <Content />
+</MarkdownPageLayout>

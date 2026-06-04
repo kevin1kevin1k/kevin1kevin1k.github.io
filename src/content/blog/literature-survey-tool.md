@@ -1,6 +1,7 @@
 ---
-layout: post
 title: Tools for literature survey, citation visualization, and paper recommendation in 2021
+description: A comparison of Semantic Scholar, Connected Papers, Litmap, Research Rabbit, and Inciteful.
+date: 2021-09-20
 ---
 
 It is common for researchers to do a literature survey.

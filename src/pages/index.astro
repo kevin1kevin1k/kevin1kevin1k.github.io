@@ -1,0 +1,18 @@
+---
+import PostList from "../components/PostList.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getPublishedPosts } from "../lib/posts";
+
+const posts = await getPublishedPosts();
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>Yu-Sheng Li</h1>
+    <p>Machine learning engineer. Notes, projects, and selected writing.</p>
+  </section>
+  <section aria-labelledby="recent-writing">
+    <h2 id="recent-writing">Recent writing</h2>
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>

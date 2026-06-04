@@ -1,0 +1,41 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const siteTitle = "Yu-Sheng Li";
+const { title, description = "Personal site and writing by Yu-Sheng Li." } = Astro.props;
+const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="site-title" href="/">Yu-Sheng Li</a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="/blog/">Blog</a>
+          <a href="/publications/">Publications</a>
+          <a href="/about/">About</a>
+          <a href="/assets/pdf/cv.pdf">CV</a>
+        </nav>
+      </header>
+      <main class="site-main">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <span>Machine learning engineer. Notes, projects, and selected writing.</span>
+      </footer>
+    </div>
+  </body>
+</html>
