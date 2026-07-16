@@ -2,3 +2,11 @@
 node_modules
 dist
 .astro
+cv/*.aux
+cv/*.fdb_latexmk
+cv/*.fls
+cv/*.log
+cv/*.out
+cv/*.pdf
+cv/*.synctex.gz
+cv/*.xdv

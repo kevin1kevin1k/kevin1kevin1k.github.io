@@ -22,6 +22,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Compile CV
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: CV.tex
+          working_directory: cv
+          latexmk_use_xelatex: true
+      - name: Publish CV PDF
+        run: |
+          mkdir -p public/assets/pdf
+          cp cv/CV.pdf public/assets/pdf/cv.pdf
+          test -s public/assets/pdf/cv.pdf
       - name: Build with Astro
         uses: withastro/action@v3
 

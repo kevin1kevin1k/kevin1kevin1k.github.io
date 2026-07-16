@@ -1,0 +1,704 @@
+% TODO: high school president of club?
+
+% !TEX TS-program = xelatex
+% !TEX encoding = UTF-8 Unicode
+% -*- coding: UTF-8; -*-
+% vim: set fenc=utf-8
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SIMPLE-RESUME-CV
+%% <https://github.com/zachscrivena/simple-resume-cv>
+%% This is free and unencumbered software released into the
+%% public domain; see <http://unlicense.org> for details.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% See "README.md" for instructions on compiling this document.
+
+\documentclass[letterpaper,MMMyyyy,nonstopmode]{simpleresumecv}
+% Class options:
+% a4paper, letterpaper, nonstopmode, draftmode
+% MMMyyyy, ddMMMyyyy, MMMMyyyy, ddMMMMyyyy, yyyyMMdd, yyyyMM, yyyy
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PREAMBLE.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath}
+\usepackage{fontawesome5}
+\usepackage{enumitem}% http://ctan.org/pkg/enumitem
+
+
+% CV Info (to be customized).
+\newcommand{\CVAuthor}{Yu-Sheng (Kevin) Li}
+\newcommand{\CVTitle}{CV of Yu-Sheng Li}
+\newcommand{\CVNote}{CV compiled on {\today}}
+\newcommand{\CVWebpage}{https://kevin1kevin1k.github.io/}
+\newcommand{\GHWebpage}{https://github.com/kevin1kevin1k/}
+\newcommand{\LIWebpage}{https://www.linkedin.com/in/yu-sheng-li/}
+
+% PDF settings and properties.
+\hypersetup{
+pdftitle={\CVTitle},
+pdfauthor={\CVAuthor},
+pdfsubject={\CVWebpage},
+pdfcreator={XeLaTeX},
+pdfproducer={},
+pdfkeywords={},
+unicode=true,
+% bookmarks=true,
+% bookmarksopen=true,
+pdfstartview=FitH,
+pdfpagelayout=OneColumn,
+pdfpagemode=UseOutlines,
+hidelinks
+% breaklinks
+}
+
+% Shorthand.
+\newcommand{\Code}[1]{\mbox{\textbf{#1}}}
+\newcommand{\CodeCommand}[1]{\mbox{\textbf{\textbackslash{#1}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ACTUAL DOCUMENT.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+%%%%%%%%%%%%%%%
+% TITLE BLOCK %
+%%%%%%%%%%%%%%%
+
+\Title{\CVAuthor}
+
+\BigGap
+
+\begin{SubTitle}
+\faEnvelope \; \href{mailto:kevin1kevin1k@gmail.com}{kevin1kevin1k@gmail.com}
+% \,\SubBulletSymbol\,
+% \href{\CVWebpage}{\url{\CVWebpage}}
+% \,\SubBulletSymbol\,
+\; $|$ \;
+\faGithub \; \href{\GHWebpage}{\url{\GHWebpage}}
+\; $|$ \;
+\faLinkedin \; \href{\LIWebpage}{\url{\LIWebpage}}
+\end{SubTitle}
+
+\begin{Body}
+
+\large
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%% WORKING EXPERIENCES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\BigGap
+
+\Section
+{Industry Experiences}
+{Industry Experiences}
+{PDF:Industry Experiences}
+
+
+
+\Entry
+\textbf{Waymo}, Taiwan
+\hfill
+\DatestampYM{2024}{12} -- present
+
+\Gap
+\BulletItem
+ML tooling Software engineer
+
+\SubBulletItem
+Building better software stack for ML models, including profiling and simulation tools
+
+
+\BigGap
+
+
+\Entry
+\textbf{Transperfect}
+\hfill
+\DatestampYM{2025}{07} -- present
+
+\Gap
+\BulletItem
+Part-time subtitle translator
+
+\SubBulletItem
+99.9 Criminal Lawyer: Seasons 1-2
+
+
+\BigGap
+
+
+
+\Entry
+\textbf{Google}, Taiwan
+\hfill
+\DatestampYM{2024}{07} -- \DatestampYM{2024}{12}
+
+\Gap
+\BulletItem
+Software engineer, Google Cloud Platforms
+
+\SubBulletItem
+Deploy and maintain cloud GPU system software
+
+
+\BigGap
+
+
+\Entry
+\textbf{Dcard}, Taiwan
+\hfill
+\DatestampYM{2021}{05} -- \DatestampYM{2024}{06}
+
+\Gap
+\BulletItem
+Machine learning engineer, ads
+
+\SubBulletItem
+\textit{Main goal: Maximizing ads revenue (with advertiser constraints) by optimizing online ads recommender systems}
+
+\SubBulletItem
+Implement automatic weekly model re-training and deployment
+
+\SubBulletItem
+Simplify ranking logic by removing 3 hard rules \\
+$\rightarrow$ CTR +12\%
+
+\SubBulletItem
+Survey and align offline evaluation metrics with online metrics \\
+$\rightarrow$ from MAP to gAUC and normalized entropy (scaled log loss)
+
+\SubBulletItem
+Mentor and help onboard another MLE
+
+\SubBulletItem
+Design a new A/B testing architecture for cost-per-click (CPC) bidding \\
+$\rightarrow$ from member-based to impression-based testing \\
+$\rightarrow$ from member bootstrapping to member bucketing with proportional budget split
+
+\SubBulletItem
+Design and implement the CTR calibration framework for CPC ads \\
+$\rightarrow$ CPC goal achieve rate from 0\% to 40\% and then 80\% 
+
+\SubBulletItem
+Design and implement an automatic price adjustment mechanism for CPC ads \\
+$\rightarrow$ budget-loss adsets rate drop by 40-60\%
+
+\SubBulletItem
+Improve LLM prompt engineering and design evaluation metrics for automatic ad title revision \\
+$\rightarrow$ adoption rate of revised version +50\%
+
+\SubBulletItem
+Propose a hierarchical ranking framework with first ad-set ranking and second creative bandit selection \\
+$\rightarrow$ automatic traffic allocation to creatives with better performance
+
+\SubBulletItem
+Feature engineering on contextual information (time, forum, position), ad industries, text-based tags, and cross features
+
+\SubBulletItem
+Create a trouble-shooting dashboard for non-engineers
+
+\Gap
+\BulletItem
+Machine learning engineer, social
+
+\SubBulletItem
+\textit{Main goal: Maximizing user engagement by personalizing homepage post feed}
+
+
+\SubBulletItem
+Rule-based hate speech traffic control \\
+$\rightarrow$ 10x reduction of daily hate speech comments
+
+\SubBulletItem
+Remove hard rules and implement embedding-based candidate for post topic recommender system \\
+$\rightarrow$ overall topic selection CTR +8\% and overall topics per post +14\%
+
+\SubBulletItem
+Improve the training set sampling strategy \\
+$\rightarrow$ homepage duration +0.7\% and 10x distinct members in dataset (bias reduced)
+
+\SubBulletItem
+Implement item-CF ($\text{EASE}^{R}$) recall candidate and replace three rule-based candidate \\
+$\rightarrow$ homepage PV +1.6\%
+
+\SubBulletItem
+Propose a new offline evaluation metric named normalized mean average precision (nMAP) with similar spirit of nDCG \\
+$\rightarrow$ aligns more consistently with online metrics
+
+\BigGap
+
+\Entry
+\textbf{Google}, Taiwan
+\hfill
+% 2019 Summer
+Jul 2019 -- Sep 2019
+
+\Gap
+\BulletItem
+Software engineering intern
+
+\SubBulletItem
+Identification and interactive clustering of test failure patterns for audio components
+
+\BigGap
+
+% \href{http://www.alibabagroup.com/en/global/home}
+\Entry
+\textbf{Alibaba Group}, China
+\hfill
+% 2017 Summer
+Jul 2017 -- Sep 2017
+
+\Gap
+\BulletItem
+Software engineering intern
+
+\SubBulletItem
+Training time reduction by 20\%-30\% of distributed training on parameter servers (which motivates Publication~\ref{alibaba-paper})
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PROJECTS AND EXPERIENCES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\BigGap
+
+\Section
+{Academic Experiences}
+{Academic Experiences}
+{PDF:Academic Experiences}
+
+
+\Entry
+\textbf{RIKEN \& Tohoku University NLP Lab}, Japan
+\hfill
+Sep 2019 -- Jan 2020
+
+\Gap
+\BulletItem
+Exchange research program (advisor: Prof. Kentaro~Inui)
+
+\SubBulletItem
+Context-aware revision for academic writing assistance
+
+\BigGap
+
+\Entry
+\textbf{Teaching Assistant},
+National Taiwan University
+
+\Gap
+\BulletItem
+\href{}{Formal languages and automata theory}
+\hfill
+2017 Fall, 2018 Fall, 2020 Fall
+% \SubBulletItem
+% Lectured by Prof. Tony Tan
+% Chih-Jen Lin
+
+\Gap
+\BulletItem
+{Data structures and algorithms}
+\hfill
+2017 Spring, 2020 Spring
+% \SubBulletItem
+% Lectured by Prof. Hsin-Mu Tsai
+% Hsuan-Tien Lin
+
+\BigGap
+
+\Entry
+\textbf{KDD Cup 2017}, NTU Team
+\hfill
+\DatestampYM{2017}{02} -- 
+\DatestampYM{2017}{06}
+
+\Gap
+\BulletItem
+Two tasks with final rankings \textbf{19/368} and \textbf{24/346}
+% \SubBulletItem
+% Predicting average travel time for some designated routes (ranked \textbf{19/368})
+% \SubBulletItem
+% Predicting average traffic volume of some tollgates (ranked \textbf{24/346})
+
+\Gap
+\BulletItem
+Contributions: Feature engineering, data analysis, and sequence to sequence learning
+
+
+
+\BigGap
+
+% \href{http://ckip.iis.sinica.edu.tw/CKIP/engversion/index.htm}
+% Chinese Knowledge and Information Processing group
+\Entry
+\textbf{Academia Sinica}, Taiwan 
+\hfill
+% 2016 Summer
+Jul 2016 -- Sep 2016
+
+\Gap
+\BulletItem
+Research intern (advisor: Dr.~Wei-Yun~Ma)
+
+\SubBulletItem
+Question answering game with knowledge bases and online resources
+% \SubBulletItem
+% Supervisor:
+% \href{http://www.iis.sinica.edu.tw/pages/ma/index_en.html}
+% {Dr.~Wei-Yun~Ma}
+
+
+
+% \BigGap
+
+% \Entry
+% \textbf{Academic Department}, NTU CSIE Student Association
+
+% \Gap
+% \BulletItem
+% As a member
+% \hfill
+% \DatestampYM{2015}{09} --
+% \DatestampYM{2016}{08}
+% \SubBulletItem
+% Gave introductory lectures to freshmen
+% \SubBulletItem
+% Prepared programming problems for Rookie Cup 2015 and
+% % \href{http://henry19950709.wixsite.com/program-contest}
+% % {TTCPC 2015}
+% Tai-Tsing-Chiao Programming Contest 2015
+% \SubBulletItem
+% Academic director of \href{https://council.csie.ntu.edu.tw/cscamp/2016/}{CSIE Camp 2016}
+
+% \Gap
+% \BulletItem
+% As a director
+% \hfill
+% \DatestampYM{2016}{09} --
+% \DatestampYM{2017}{06}
+
+% % \DatestampYM{2016}{08}
+% \SubBulletItem
+% Hosted Rookie Cup and \href{https://council.csie.ntu.edu.tw/2016TTCPC/index.html}{TTCPC 2016}
+
+% \BigGap
+
+% \Entry
+% \href{http://www.itcsc.cuhk.edu.hk/Winter_School/Winter_School_2017/index.html}
+% {\textbf{ITCSC-INC Winter School}, Chinese University of Hong Kong (CUHK)}
+% \hfill
+% \DatestampYM{2017}{01}
+
+% \Gap
+% \BulletItem
+% Took courses on convex optimization and information theory
+
+
+
+% \BigGap
+
+% \Entry
+% \textbf{Hackathons}
+
+% \Gap
+% \BulletItem
+% MakeNTU
+% \hfill
+% \DatestampYM{2017}{02}
+% \SubBulletItem
+% Collaboratively built an IOT device and framework to help the blind walk across the roads
+
+% \Gap
+% \BulletItem
+% HackNTU
+% \hfill
+% \DatestampYM{2015}{08}
+% \SubBulletItem
+% Collaboratively developed an Android application to improve the distribution of excessive resources
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% VOLUNTEER EXPERIENCES%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\BigGap
+
+\Section
+{Volunteer Experiences}
+{Volunteer Experiences}
+{PDF:Volunteer Experiences}
+
+\Entry
+\textbf{Python Conference (PyCon) Taiwan}
+
+\Gap
+\BulletItem
+Sponsorship team co-lead
+\hfill
+\DatestampYM{2022}{10} -- \DatestampYM{2023}{09}
+
+\Gap
+\BulletItem
+Sponsorship team member
+\hfill
+\DatestampYM{2022}{03} -- present
+
+
+\BigGap
+
+\Entry
+\textbf{Taiwan Linguistics Olympiad Camp}
+\hfill
+\DatestampYM{2019}{07}
+
+\Gap
+\BulletItem
+Lecturer on computational thinking
+
+
+
+\BigGap
+
+\Entry
+\textbf{Traditional Chinese translation of the Python Documentation}
+\hfill
+\DatestampYM{2023}{08} -- present
+
+\Gap
+\BulletItem
+Translator of parts of the Python 3.12 documents
+
+
+
+
+%%%%%%%%%%%%%%%%%%
+%% PUBLICATIONS %%
+%%%%%%%%%%%%%%%%%%
+
+\BigGap
+
+\Section
+{Publications}
+{Publications}
+{PDF:Publications}
+
+\begin{enumerate}[label={[\arabic*]}]
+\item\quad \label{master-thesis}
+Bowen Yuan, \textbf{Yu-Sheng Li}, Pengrui Quan, Chih-Jen Lin. Efficient Optimization Methods for Extreme Similarity Learning with Nonlinear Embeddings.
+In \textit{ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD), 2021.}
+
+\Gap
+
+\item\quad
+\textbf{Yu-Sheng Li}, Wei-Lin Chiang, Ching-pei Lee. Manifold Identification for Ultimately Communication-Efficient Distributed Optimization.
+In \textit{International Conference on Machine Learning (ICML), 2020.}
+
+\Gap
+
+\item\quad \label{alibaba-paper}
+Wei-Lin Chiang, \textbf{Yu-Sheng Li}, Ching-pei Lee, Chih-Jen Lin. Limited-memory Common-directions Method for Distributed L1-regularized Linear Classification.
+In \textit{SIAM International Conference on Data Mining (SDM), 2018.}
+
+\Gap
+
+\item\quad
+\textbf{Yu-Sheng Li}, Chien-Hui Tseng, Chian-Yun Huang, Wei-Yun Ma.
+Guess What: A Question Answering Game via On-demand Knowledge Validation.
+In \textit{International Joint Conference on Natural Language Processing (IJCNLP), 2017.}
+
+    % \label{alibaba-paper}
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%
+%% EDUCATION %%
+%%%%%%%%%%%%%%%
+
+\BigGap
+
+\Section
+{Education}
+{Education}
+{PDF:Education}
+
+\Entry
+\textbf{National Taiwan University},
+Taiwan
+
+\Gap
+\BulletItem
+M.S. in Computer Science (advisor: Prof.~Chih-Jen~Lin)
+\hfill
+\DatestampYM{2018}{09} -- \DatestampYM{2021}{01}
+
+
+\Gap
+\SubBulletItem
+Research and master thesis: Publication~\ref{master-thesis}
+
+\Gap
+\BulletItem
+B.S. in Computer Science, with minor in Mathematics
+\hfill
+\DatestampYM{2014}{09} -- \DatestampYM{2018}{06}
+
+% \Gap
+% \SubBulletItem
+% Minor in Mathematics
+
+\Gap
+\SubBulletItem
+Undergraduate GPA: 4.08 / 4.3
+
+
+
+
+%%%%%%%%%%%%
+%% AWARDS %%
+%%%%%%%%%%%%
+
+% \BigGap
+
+% \Section
+% {Awards}
+% {Awards}
+% {PDF:Awards}
+
+% \BulletItem \textbf{Second place}, Bachelor Degree Thesis Award, National Taiwan University
+% \hfill
+% \DatestampY{2018}
+
+
+
+
+%%%%%%%%%%%%
+%% SKILLS %%
+%%%%%%%%%%%%
+
+\BigGap
+
+\Section
+{Skills sets}
+{Skills sets}
+{PDF:Skills sets}
+
+% \BulletItem
+\Entry
+\textbf{Programming Languages}
+
+\Gap
+Python,
+SQL,
+C/C++,
+JavaScript,
+Shell scripting
+% Haskell
+
+% \LaTeX
+
+% \BulletItem
+\BigGap
+\Entry
+\textbf{Skills and tools}
+
+\Gap\BulletItem Data science and machine learning: scikit-learn, xgboost, PyTorch, TensorFlow, numpy, pandas, Jupyter Notebook
+\Gap\BulletItem Natural language processing: gensim, nltk, fairseq, spaCy, transformers
+\Gap\BulletItem Workflow orchestration and ETL pipelines: Apache Airflow
+\Gap\BulletItem Database and feature stores: BigQuery, PostgreSQL, MongoDB
+\Gap\BulletItem Statistics: hypothesis testing and online A/B testing
+\Gap\BulletItem Knowledge in large-scale optimization
+
+
+%%%%%%%%%%%%%%%
+%% LANGUAGES %%
+%%%%%%%%%%%%%%%
+
+\BigGap
+
+\Section
+{Communication}
+{Communication}
+{PDF:Communication}
+
+\BigGap
+
+\BulletItem Mandarin (native)
+\Gap
+\BulletItem English (fluent)
+\Gap
+\BulletItem Japanese (conversational)
+
+
+%%%%%%%%%%%%%%%%%
+% COMPETITIONS %%
+%%%%%%%%%%%%%%%%%
+
+% \BigGap
+
+% \Section
+% {Competitions}
+% {Competitions}
+% {PDF:Competitions}
+
+% \Gap
+% \BulletItem
+% \textbf{Excellent Award},
+% National Problem Solving Contest (Senior High)
+% \hfill
+% \DatestampY{2014}
+
+% \Gap
+% \BulletItem
+% \textbf{Excellent Award},
+% International Student Software Competition
+% \hfill
+% \DatestampY{2013}
+
+% \Gap
+% \BulletItem
+% \textbf{3rd Place},
+% Taipei Computer Software Design Contest
+% \hfill
+% \DatestampY{2012}
+
+% \Gap
+% \BulletItem
+% \textbf{7th Place},
+% National Problem Solving Contest (Junior High)
+% \hfill
+% \DatestampY{2009}
+
+
+\BigGap
+
+\Section
+{Hobbies}
+{Hobbies}
+{PDF:Hobbies}
+
+\Gap
+\BulletItem Exercises (basketball, jogging, squash, bouldering, gym)
+\BulletItem Chess
+\BulletItem Puzzles
+
+
+
+\end{Body}
+
+%%%%%%%%%%%
+% CV NOTE %
+%%%%%%%%%%%
+
+% \UseNoteFont%
+% \null\hfill%
+% [\textit{\CVNote}]
+
+\end{document}
