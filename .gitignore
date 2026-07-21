@@ -2,6 +2,9 @@
 node_modules
 dist
 .astro
+.DS_Store
+.jekyll-cache
+_site
 cv/*.aux
 cv/*.fdb_latexmk
 cv/*.fls
@@ -10,3 +13,4 @@ cv/*.out
 cv/*.pdf
 cv/*.synctex.gz
 cv/*.xdv
+public/assets/pdf/cv.pdf
