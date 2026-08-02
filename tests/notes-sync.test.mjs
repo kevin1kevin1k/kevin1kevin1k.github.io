@@ -142,6 +142,142 @@ tags: [public]
   );
 });
 
+test("rewrites reference-style note links and images", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [
+        { source: "First.md", slug: "first" },
+        { source: "folder/Second.md", slug: "guides/second" },
+      ],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "First.md",
+    `---
+title: First
+updated: 2026-08-02
+lang: en
+---
+
+[Second][second]
+
+![Diagram][diagram]
+
+[second]: folder/Second.md#Details
+[diagram]: assets/diagram.png
+`,
+  );
+  await writeNote(
+    vaultDir,
+    "folder/Second.md",
+    `---
+title: Second
+updated: 2026-08-02
+lang: en
+---
+
+## Details
+`,
+  );
+  await mkdir(join(vaultDir, "assets"));
+  await writeFile(join(vaultDir, "assets/diagram.png"), "PNG_CONTENT");
+
+  await syncNotes({ repositoryDir, vaultDir });
+
+  const exported = await readFile(
+    join(repositoryDir, "src/content/notes/first.md"),
+    "utf8",
+  );
+  assert.match(exported, /\[second\]: \/notes\/guides\/second\/#details/);
+  assert.match(
+    exported,
+    /\[diagram\]: \/assets\/notes\/first\/[a-f0-9]{12}-diagram\.png/,
+  );
+});
+
+test("rejects private reference-style links without replacing the snapshot", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  const existingNotes = join(repositoryDir, "src/content/notes");
+  await mkdir(existingNotes, { recursive: true });
+  await writeFile(join(existingNotes, "old.md"), "PREVIOUS_NOTE");
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [{ source: "Public.md", slug: "public" }],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Public.md",
+    `---
+title: Public
+updated: 2026-08-02
+lang: en
+---
+
+[Secret][private]
+
+[private]: Private.md
+`,
+  );
+  await writeNote(vaultDir, "Private.md", "PRIVATE_SENTINEL");
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Linked note is not public: Private\.md/,
+  );
+  assert.equal(await readFile(join(existingNotes, "old.md"), "utf8"), "PREVIOUS_NOTE");
+});
+
+test("rejects a relative definition shared by link and image references", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [
+        { source: "First.md", slug: "first" },
+        { source: "Second.md", slug: "second" },
+      ],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "First.md",
+    `---
+title: First
+updated: 2026-08-02
+lang: en
+---
+
+[Second][shared]
+![Image][shared]
+
+[shared]: Second.md
+`,
+  );
+  await writeNote(
+    vaultDir,
+    "Second.md",
+    `---
+title: Second
+updated: 2026-08-02
+lang: en
+---
+`,
+  );
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Reference shared cannot be both a note link and an image/,
+  );
+});
+
 test("rejects notes with invalid public metadata", async () => {
   const { repositoryDir, vaultDir } = await createFixture();
   await writeFile(
@@ -168,6 +304,63 @@ Invalid metadata must not be published.
     syncNotes({ repositoryDir, vaultDir }),
     /Invalid\.md.*updated|Invalid\.md.*lang/,
   );
+});
+
+test("rejects calendar dates that do not exist", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [{ source: "Invalid.md", slug: "invalid" }],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Invalid.md",
+    `---
+title: Invalid date
+updated: 2026-02-30
+lang: en
+---
+`,
+  );
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Invalid\.md has invalid updated metadata/,
+  );
+});
+
+test("rejects tag route collisions before replacing the snapshot", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  const existingNotes = join(repositoryDir, "src/content/notes");
+  await mkdir(existingNotes, { recursive: true });
+  await writeFile(join(existingNotes, "old.md"), "PREVIOUS_NOTE");
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [{ source: "Tags.md", slug: "tags" }],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Tags.md",
+    `---
+title: Tag collision
+updated: 2026-08-02
+lang: en
+tags: [C++, C#]
+---
+`,
+  );
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Tag slug collision: C\+\+ and C#/,
+  );
+  assert.equal(await readFile(join(existingNotes, "old.md"), "utf8"), "PREVIOUS_NOTE");
 });
 
 test("rejects manifest sources outside the vault", async () => {
@@ -313,6 +506,111 @@ lang: en
   await assert.rejects(
     syncNotes({ repositoryDir, vaultDir }),
     /Ambiguous wikilink: Shared/,
+  );
+});
+
+test("rejects missing cross-note heading fragments before replacing the snapshot", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  const existingNotes = join(repositoryDir, "src/content/notes");
+  await mkdir(existingNotes, { recursive: true });
+  await writeFile(join(existingNotes, "old.md"), "PREVIOUS_NOTE");
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [
+        { source: "Source.md", slug: "source" },
+        { source: "Target.md", slug: "target" },
+      ],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Source.md",
+    `---
+title: Source
+updated: 2026-08-02
+lang: en
+---
+
+[Missing heading](Target.md#Missing)
+`,
+  );
+  await writeNote(
+    vaultDir,
+    "Target.md",
+    `---
+title: Target
+updated: 2026-08-02
+lang: en
+---
+
+## Existing
+`,
+  );
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Missing heading fragment #missing in Target\.md/,
+  );
+  assert.equal(await readFile(join(existingNotes, "old.md"), "utf8"), "PREVIOUS_NOTE");
+});
+
+test("rejects missing same-note heading fragments", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [{ source: "Source.md", slug: "source" }],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Source.md",
+    `---
+title: Source
+updated: 2026-08-02
+lang: en
+---
+
+[Missing heading](#Missing)
+`,
+  );
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Missing heading fragment #missing in Source\.md/,
+  );
+});
+
+test("rejects missing same-note fragments in reference definitions", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [{ source: "Source.md", slug: "source" }],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Source.md",
+    `---
+title: Source
+updated: 2026-08-02
+lang: en
+---
+
+[Missing heading][local]
+
+[local]: #Missing
+`,
+  );
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Missing heading fragment #missing in Source\.md/,
   );
 });
 

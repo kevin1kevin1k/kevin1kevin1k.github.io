@@ -29,6 +29,8 @@ import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 import { parse as parseYaml } from "yaml";
 
+import { validateTagNames } from "../../src/lib/note-graph.mjs";
+
 const imageExtensions = new Set([".avif", ".gif", ".jpeg", ".jpg", ".png", ".webp"]);
 const parser = unified().use(remarkParse).use(remarkFrontmatter, ["yaml"]).use(remarkGfm);
 const serializer = unified()
@@ -92,10 +94,17 @@ function validateMetadata(tree, source) {
   if (!data || typeof data.title !== "string" || data.title.trim() === "") {
     throw new Error(`${source} has invalid title metadata.`);
   }
+  const dateParts = typeof data.updated === "string"
+    ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(data.updated)
+    : null;
+  const parsedDate = dateParts
+    ? new Date(Date.UTC(Number(dateParts[1]), Number(dateParts[2]) - 1, Number(dateParts[3])))
+    : null;
   if (
-    typeof data.updated !== "string" ||
-    !/^\d{4}-\d{2}-\d{2}$/.test(data.updated) ||
-    Number.isNaN(Date.parse(`${data.updated}T00:00:00Z`))
+    !dateParts ||
+    parsedDate.getUTCFullYear() !== Number(dateParts[1]) ||
+    parsedDate.getUTCMonth() !== Number(dateParts[2]) - 1 ||
+    parsedDate.getUTCDate() !== Number(dateParts[3])
   ) {
     throw new Error(`${source} has invalid updated metadata.`);
   }
@@ -129,6 +138,49 @@ function normalizeFragment(fragment) {
   return new GithubSlugger().slug(decodeURIComponent(fragment));
 }
 
+function nodeText(node) {
+  if (typeof node.value === "string") return node.value;
+  return (node.children ?? []).map(nodeText).join("");
+}
+
+function collectHeadingSlugs(tree) {
+  const headings = new Set();
+  const slugger = new GithubSlugger();
+
+  function walk(node) {
+    if (node.type === "heading") headings.add(slugger.slug(nodeText(node)));
+    for (const child of node.children ?? []) walk(child);
+  }
+  walk(tree);
+  return headings;
+}
+
+function collectReferenceKinds(tree) {
+  const references = new Map();
+
+  function add(identifier, kind) {
+    const kinds = references.get(identifier) ?? new Set();
+    kinds.add(kind);
+    references.set(identifier, kinds);
+  }
+
+  function walk(node) {
+    if (node.type === "linkReference") add(node.identifier, "link");
+    if (node.type === "imageReference") add(node.identifier, "image");
+    for (const child of node.children ?? []) walk(child);
+  }
+  walk(tree);
+  return references;
+}
+
+function assertFragmentExists(note, fragment) {
+  const anchor = normalizeFragment(fragment);
+  if (anchor && !note.headings.has(anchor)) {
+    throw new Error(`Missing heading fragment #${anchor} in ${note.source}`);
+  }
+  return anchor;
+}
+
 function isExternalUrl(url) {
   return /^(?:[a-z][a-z\d+.-]*:|\/|#)/i.test(url);
 }
@@ -153,7 +205,7 @@ function resolvePublicNote(target, currentNote, notesBySource) {
     throw new Error(`Linked note is not public: ${target} (from ${currentNote.source})`);
   }
 
-  const anchor = normalizeFragment(fragment);
+  const anchor = assertFragmentExists(note, fragment);
   return `/notes/${note.slug}/${anchor ? `#${anchor}` : ""}`;
 }
 
@@ -275,8 +327,36 @@ async function transformChildren(parent, currentNote, context) {
       }
       continue;
     }
+    if (child.type === "definition") {
+      const kinds = currentNote.references.get(child.identifier) ?? new Set();
+      if (kinds.has("link") && kinds.has("image")) {
+        throw new Error(
+          `Reference ${child.identifier} cannot be both a note link and an image`,
+        );
+      }
+      if (child.url.startsWith("#") && child.url !== "#") {
+        if (kinds.has("image")) {
+          throw new Error(`Image reference ${child.identifier} cannot target a heading`);
+        }
+        child.url = `#${assertFragmentExists(currentNote, child.url.slice(1))}`;
+        continue;
+      }
+      if (isExternalUrl(child.url)) continue;
+      if (kinds.has("image") || imageExtensions.has(extname(splitTarget(child.url).path).toLowerCase())) {
+        child.url = (await publishImage(child.url, "", currentNote, context)).url;
+      } else {
+        child.url = resolvePublicNote(child.url, currentNote, context.notesBySource);
+      }
+      continue;
+    }
     if (child.type === "image" && !isExternalUrl(child.url)) {
       parent.children[index] = await publishImage(child.url, child.alt, currentNote, context);
+      continue;
+    }
+    if (child.type === "link" && child.url.startsWith("#") && child.url !== "#") {
+      const anchor = assertFragmentExists(currentNote, child.url.slice(1));
+      child.url = `#${anchor}`;
+      await transformChildren(child, currentNote, context);
       continue;
     }
     if (child.type === "link" && !isExternalUrl(child.url)) {
@@ -297,19 +377,32 @@ export async function syncNotes({ repositoryDir, vaultDir }) {
     await readFile(join(vaultRoot, "public-notes.json"), "utf8"),
   );
   const notes = validateManifest(manifest);
-  const notesBySource = new Map(notes.map((note) => [note.source, note]));
   const stageRoot = await mkdtemp(join(repositoryRoot, ".notes-sync-"));
   const outputRoot = join(stageRoot, "output");
-  const context = { notesBySource, outputRoot, vaultRoot };
 
   try {
     await mkdir(join(outputRoot, "src/content/notes"), { recursive: true });
     await mkdir(join(outputRoot, "public/assets/notes"), { recursive: true });
+    const parsedNotes = [];
     for (const note of notes) {
       const sourcePath = await resolveVaultFile(vaultRoot, note.source);
       const source = await readFile(sourcePath, "utf8");
       const tree = parser.parse(source);
-      validateMetadata(tree, note.source);
+      const metadata = validateMetadata(tree, note.source);
+      parsedNotes.push({
+        ...note,
+        headings: collectHeadingSlugs(tree),
+        metadata,
+        references: collectReferenceKinds(tree),
+        tree,
+      });
+    }
+    validateTagNames(parsedNotes.flatMap((note) => note.metadata.tags ?? []));
+
+    const notesBySource = new Map(parsedNotes.map((note) => [note.source, note]));
+    const context = { notesBySource, outputRoot, vaultRoot };
+    for (const note of parsedNotes) {
+      const { tree } = note;
       await transformChildren(tree, note, context);
       const destination = join(outputRoot, "src/content/notes", `${note.slug}.md`);
       await mkdir(dirname(destination), { recursive: true });

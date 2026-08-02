@@ -35,6 +35,8 @@ jobs:
           test -s public/assets/pdf/cv.pdf
       - name: Build with Astro
         uses: withastro/action@v3
+      - name: Verify generated site
+        run: npm run verify
 
   deploy:
     needs: build

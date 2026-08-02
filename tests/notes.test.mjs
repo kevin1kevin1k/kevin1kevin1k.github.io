@@ -29,6 +29,10 @@ test("rejects distinct tags that normalize to the same route", () => {
     () => getTagIndex([note("one.md", "One", "", ["C++", "C#"])]),
     /Tag slug collision.*C\+\+.*C#/,
   );
+  assert.throws(
+    () => getTagIndex([note("empty.md", "Empty", "", [""])]),
+    /Tag cannot produce a route/,
+  );
 });
 
 test("builds backlinks from note links but ignores code examples", () => {

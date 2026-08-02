@@ -17,12 +17,29 @@ export function toTagSlug(tag) {
   return new GithubSlugger().slug(tag.normalize("NFKC").trim());
 }
 
+function registerTag(tagsBySlug, tag) {
+  const slug = toTagSlug(tag);
+  if (!slug) throw new Error(`Tag cannot produce a route: ${tag}`);
+  const existing = tagsBySlug.get(slug);
+  if (existing && existing !== tag) {
+    throw new Error(`Tag slug collision: ${existing} and ${tag}`);
+  }
+  tagsBySlug.set(slug, tag);
+  return slug;
+}
+
+export function validateTagNames(tags) {
+  const tagsBySlug = new Map();
+  for (const tag of tags) registerTag(tagsBySlug, tag);
+  return tagsBySlug;
+}
+
 export function getTagIndex(notes) {
+  validateTagNames(notes.flatMap((note) => note.data.tags));
   const tagsBySlug = new Map();
   for (const note of notes) {
     for (const tag of note.data.tags) {
       const slug = toTagSlug(tag);
-      if (!slug) throw new Error(`Tag cannot produce a route: ${tag}`);
       const existing = tagsBySlug.get(slug);
       if (existing && existing.name !== tag) {
         throw new Error(`Tag slug collision: ${existing.name} and ${tag}`);

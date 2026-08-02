@@ -1,6 +1,13 @@
 import { getCollection } from "astro:content";
 
-export { getBacklinks, getNoteSlug, getNoteUrl, getTagIndex, toTagSlug } from "./note-graph.mjs";
+export {
+  getBacklinks,
+  getNoteSlug,
+  getNoteUrl,
+  getTagIndex,
+  toTagSlug,
+  validateTagNames,
+} from "./note-graph.mjs";
 
 export async function getNotes() {
   const notes = await getCollection("notes");
