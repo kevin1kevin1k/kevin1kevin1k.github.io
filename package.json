@@ -6,14 +6,24 @@
   "scripts": {
     "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
     "build:cv": "node scripts/build-cv.mjs",
+    "notes:sync": "node scripts/notes/sync-notes.mjs",
     "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
     "preview": "astro preview",
     "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "test": "node --test",
     "verify": "node scripts/verify-site.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
-    "astro": "^5.15.0"
+    "astro": "^5.15.0",
+    "github-slugger": "^2.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
