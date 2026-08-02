@@ -240,6 +240,51 @@ lang: en
   await assert.rejects(access(join(repositoryDir, "public/assets/notes/public")));
 });
 
+test("rejects duplicate reference definitions without copying private attachments", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  const existingNotes = join(repositoryDir, "src/content/notes");
+  const existingAssets = join(repositoryDir, "public/assets/notes/old");
+  await mkdir(existingNotes, { recursive: true });
+  await mkdir(existingAssets, { recursive: true });
+  await writeFile(join(existingNotes, "old.md"), "PREVIOUS_NOTE");
+  await writeFile(join(existingAssets, "old.png"), "PREVIOUS_IMAGE");
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [{ source: "Public.md", slug: "public" }],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Public.md",
+    `---
+title: Public
+updated: 2026-08-02
+lang: en
+---
+
+![Visible][duplicate]
+
+[duplicate]: public.png
+[duplicate]: private.png
+`,
+  );
+  await writeFile(join(vaultDir, "public.png"), "PUBLIC_IMAGE");
+  await writeFile(join(vaultDir, "private.png"), "PRIVATE_IMAGE");
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Duplicate reference definition: duplicate in Public\.md/,
+  );
+  assert.equal(await readFile(join(existingNotes, "old.md"), "utf8"), "PREVIOUS_NOTE");
+  assert.equal(
+    await readFile(join(existingAssets, "old.png"), "utf8"),
+    "PREVIOUS_IMAGE",
+  );
+  await assert.rejects(access(join(repositoryDir, "public/assets/notes/public")));
+});
+
 test("rejects private reference-style links without replacing the snapshot", async () => {
   const { repositoryDir, vaultDir } = await createFixture();
   const existingNotes = join(repositoryDir, "src/content/notes");

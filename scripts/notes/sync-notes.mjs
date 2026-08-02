@@ -173,6 +173,22 @@ function collectReferenceKinds(tree) {
   return references;
 }
 
+function validateReferenceDefinitions(tree, source) {
+  const identifiers = new Set();
+
+  function walk(node) {
+    if (node.type === "definition") {
+      if (identifiers.has(node.identifier)) {
+        throw new Error(`Duplicate reference definition: ${node.identifier} in ${source}`);
+      }
+      identifiers.add(node.identifier);
+    }
+    for (const child of node.children ?? []) walk(child);
+  }
+
+  walk(tree);
+}
+
 function assertFragmentExists(note, fragment) {
   const anchor = normalizeFragment(fragment);
   if (anchor && !note.headings.has(anchor)) {
@@ -418,6 +434,7 @@ export async function syncNotes({ repositoryDir, vaultDir }) {
       const sourcePath = await resolveVaultFile(vaultRoot, note.source);
       const source = await readFile(sourcePath, "utf8");
       const tree = parser.parse(source);
+      validateReferenceDefinitions(tree, note.source);
       const metadata = validateMetadata(tree, note.source);
       parsedNotes.push({
         ...note,

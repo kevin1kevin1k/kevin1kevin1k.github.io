@@ -56,10 +56,18 @@ export function getTagIndex(notes) {
 
 function getOutgoingNoteSlugs(markdown) {
   const links = new Set();
+  const linkReferences = new Set();
   const tree = markdownParser.parse(markdown);
-  visit(tree, "link", (node) => {
-    const match = node.url.match(/^\/notes\/(.+?)\/?(?:#.*)?$/);
+
+  function registerUrl(url) {
+    const match = url.match(/^\/notes\/(.+?)\/?(?:#.*)?$/);
     if (match) links.add(decodeURIComponent(match[1]));
+  }
+
+  visit(tree, "link", (node) => registerUrl(node.url));
+  visit(tree, "linkReference", (node) => linkReferences.add(node.identifier));
+  visit(tree, "definition", (node) => {
+    if (linkReferences.has(node.identifier)) registerUrl(node.url);
   });
   return links;
 }
