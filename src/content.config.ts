@@ -19,4 +19,15 @@ const pages = defineCollection({
   }),
 });
 
-export const collections = { blog, pages };
+const notes = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    updated: z.coerce.date(),
+    lang: z.enum(["en", "zh-TW"]),
+    tags: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { blog, notes, pages };

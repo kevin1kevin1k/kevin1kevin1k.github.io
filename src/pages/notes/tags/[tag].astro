@@ -1,0 +1,34 @@
+---
+import type { CollectionEntry } from "astro:content";
+import NoteList from "../../../components/NoteList.astro";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getNotes, getTagIndex } from "../../../lib/notes";
+
+interface TagPage {
+  name: string;
+  notes: CollectionEntry<"notes">[];
+  slug: string;
+}
+
+export async function getStaticPaths() {
+  const notes = await getNotes();
+  return [...getTagIndex(notes).values()].map((tag) => ({
+    params: { tag: tag.slug },
+    props: { tag },
+  }));
+}
+
+interface Props {
+  tag: TagPage;
+}
+
+const { tag } = Astro.props;
+---
+
+<BaseLayout title={`Notes tagged ${tag.name}`}>
+  <header class="page-header">
+    <p><a href="/notes/">Notes</a></p>
+    <h1>{tag.name}</h1>
+  </header>
+  <NoteList notes={tag.notes} />
+</BaseLayout>

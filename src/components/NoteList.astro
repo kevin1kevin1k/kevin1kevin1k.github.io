@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatNoteDate, getNoteUrl, toTagSlug } from "../lib/notes";
+
+interface Props {
+  notes: CollectionEntry<"notes">[];
+}
+
+const { notes } = Astro.props;
+---
+
+<ul class="note-list">
+  {
+    notes.map((note) => (
+      <li class="note-list-item">
+        <article>
+          <h2>
+            <a href={getNoteUrl(note.id)}>{note.data.title}</a>
+          </h2>
+          <div class="note-meta">
+            <time datetime={note.data.updated.toISOString()}>
+              Updated {formatNoteDate(note.data.updated, note.data.lang)}
+            </time>
+            {note.data.tags.length > 0 && (
+              <ul class="tag-list" aria-label="Tags">
+                {note.data.tags.map((tag) => (
+                  <li>
+                    <a href={`/notes/tags/${toTagSlug(tag)}/`}>{tag}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {note.data.description && <p>{note.data.description}</p>}
+        </article>
+      </li>
+    ))
+  }
+</ul>

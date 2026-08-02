@@ -4,15 +4,20 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  lang?: "en" | "zh-TW";
 }
 
 const siteTitle = "Yu-Sheng Li";
-const { title, description = "Personal site and writing by Yu-Sheng Li." } = Astro.props;
+const {
+  title,
+  description = "Personal site and writing by Yu-Sheng Li.",
+  lang = "en",
+} = Astro.props;
 const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,6 +30,7 @@ const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
         <a class="site-title" href="/">Yu-Sheng Li</a>
         <nav class="site-nav" aria-label="Main navigation">
           <a href="/blog/">Blog</a>
+          <a href="/notes/">Notes</a>
           <a href="/publications/">Publications</a>
           <a href="/about/">About</a>
           <a href="/assets/pdf/cv.pdf">CV</a>

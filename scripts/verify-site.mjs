@@ -13,6 +13,16 @@ const checks = [
     "blog/literature-survey-tool/index.html",
     ["Tools for literature survey", "/assets/images/literature-survey-tool/semantic-1.png"],
   ],
+  ["notes/index.html", ["Notes", "Public knowledge base", "發布公開筆記"]],
+  [
+    "notes/public-knowledge-base/index.html",
+    ["Public knowledge base", "Backlinks", "發布公開筆記"],
+  ],
+  [
+    "notes/publishing-public-notes/index.html",
+    ["發布公開筆記", "Backlinks", "Public knowledge base"],
+  ],
+  ["notes/tags/workflow/index.html", ["workflow", "Public knowledge base", "發布公開筆記"]],
   ["404.html", ["404"]],
   ["first-post/index.html", ["url=/blog/first-post/"]],
   ["literature-survey-tool/index.html", ["url=/blog/literature-survey-tool/"]],
