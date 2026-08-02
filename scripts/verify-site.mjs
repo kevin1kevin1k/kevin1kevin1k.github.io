@@ -1,6 +1,8 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import { findBrokenInternalLinks } from "./lib/verify-links.mjs";
+
 const dist = join(process.cwd(), "dist");
 
 const checks = [
@@ -62,6 +64,14 @@ for (const asset of assets) {
   if (statSync(fullPath).size === 0) {
     throw new Error(`${asset} is empty`);
   }
+}
+
+const brokenLinks = await findBrokenInternalLinks(dist);
+if (brokenLinks.length > 0) {
+  const details = brokenLinks
+    .map((issue) => `${issue.source}: ${issue.href} (${issue.reason})`)
+    .join("\n");
+  throw new Error(`Broken internal links:\n${details}`);
 }
 
 console.log("Site verification passed.");
