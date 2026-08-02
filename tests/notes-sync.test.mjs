@@ -199,6 +199,47 @@ lang: en
   );
 });
 
+test("rejects unused relative definitions without replacing the snapshot", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  const existingNotes = join(repositoryDir, "src/content/notes");
+  const existingAssets = join(repositoryDir, "public/assets/notes/old");
+  await mkdir(existingNotes, { recursive: true });
+  await mkdir(existingAssets, { recursive: true });
+  await writeFile(join(existingNotes, "old.md"), "PREVIOUS_NOTE");
+  await writeFile(join(existingAssets, "old.png"), "PREVIOUS_IMAGE");
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [{ source: "Public.md", slug: "public" }],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Public.md",
+    `---
+title: Public
+updated: 2026-08-02
+lang: en
+---
+
+[private]: private.png
+`,
+  );
+  await writeFile(join(vaultDir, "private.png"), "PRIVATE_IMAGE");
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Unused relative definition: private/,
+  );
+  assert.equal(await readFile(join(existingNotes, "old.md"), "utf8"), "PREVIOUS_NOTE");
+  assert.equal(
+    await readFile(join(existingAssets, "old.png"), "utf8"),
+    "PREVIOUS_IMAGE",
+  );
+  await assert.rejects(access(join(repositoryDir, "public/assets/notes/public")));
+});
+
 test("rejects private reference-style links without replacing the snapshot", async () => {
   const { repositoryDir, vaultDir } = await createFixture();
   const existingNotes = join(repositoryDir, "src/content/notes");
@@ -552,6 +593,121 @@ lang: en
   await assert.rejects(
     syncNotes({ repositoryDir, vaultDir }),
     /Missing heading fragment #missing in Target\.md/,
+  );
+  assert.equal(await readFile(join(existingNotes, "old.md"), "utf8"), "PREVIOUS_NOTE");
+});
+
+test("validates fragments against headings after wikilink transformation", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [
+        { source: "Source.md", slug: "source" },
+        { source: "Target.md", slug: "target" },
+        { source: "Other.md", slug: "other" },
+      ],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Source.md",
+    `---
+title: Source
+updated: 2026-08-02
+lang: en
+---
+
+[Transformed heading](Target.md#Alias)
+`,
+  );
+  await writeNote(
+    vaultDir,
+    "Target.md",
+    `---
+title: Target
+updated: 2026-08-02
+lang: en
+---
+
+## [[Other|Alias]]
+`,
+  );
+  await writeNote(
+    vaultDir,
+    "Other.md",
+    `---
+title: Other
+updated: 2026-08-02
+lang: en
+---
+`,
+  );
+
+  await syncNotes({ repositoryDir, vaultDir });
+
+  const exported = await readFile(
+    join(repositoryDir, "src/content/notes/source.md"),
+    "utf8",
+  );
+  assert.match(exported, /\[Transformed heading\]\(\/notes\/target\/#alias\)/);
+});
+
+test("rejects fragments that only match untransformed wikilink headings", async () => {
+  const { repositoryDir, vaultDir } = await createFixture();
+  const existingNotes = join(repositoryDir, "src/content/notes");
+  await mkdir(existingNotes, { recursive: true });
+  await writeFile(join(existingNotes, "old.md"), "PREVIOUS_NOTE");
+  await writeFile(
+    join(vaultDir, "public-notes.json"),
+    JSON.stringify({
+      version: 1,
+      notes: [
+        { source: "Source.md", slug: "source" },
+        { source: "Target.md", slug: "target" },
+        { source: "Other.md", slug: "other" },
+      ],
+    }),
+  );
+  await writeNote(
+    vaultDir,
+    "Source.md",
+    `---
+title: Source
+updated: 2026-08-02
+lang: en
+---
+
+[Stale heading](Target.md#OtherAlias)
+`,
+  );
+  await writeNote(
+    vaultDir,
+    "Target.md",
+    `---
+title: Target
+updated: 2026-08-02
+lang: en
+---
+
+## [[Other|Alias]]
+`,
+  );
+  await writeNote(
+    vaultDir,
+    "Other.md",
+    `---
+title: Other
+updated: 2026-08-02
+lang: en
+---
+`,
+  );
+
+  await assert.rejects(
+    syncNotes({ repositoryDir, vaultDir }),
+    /Missing heading fragment #otheralias in Target\.md/,
   );
   assert.equal(await readFile(join(existingNotes, "old.md"), "utf8"), "PREVIOUS_NOTE");
 });

@@ -205,8 +205,35 @@ function resolvePublicNote(target, currentNote, notesBySource) {
     throw new Error(`Linked note is not public: ${target} (from ${currentNote.source})`);
   }
 
-  const anchor = assertFragmentExists(note, fragment);
+  const anchor = normalizeFragment(fragment);
   return `/notes/${note.slug}/${anchor ? `#${anchor}` : ""}`;
+}
+
+function validateFinalFragments(tree, currentNote, notesBySlug) {
+  function walk(node) {
+    if (node.type === "link" || node.type === "definition") {
+      const { fragment, path } = splitTarget(node.url);
+      let targetNote;
+
+      if (fragment && path === "") {
+        targetNote = currentNote;
+      } else if (fragment) {
+        const noteRoute = /^\/notes\/(.+)\/$/.exec(path);
+        if (noteRoute) {
+          targetNote = notesBySlug.get(noteRoute[1]);
+          if (!targetNote) {
+            throw new Error(`Linked note is not public: ${path} (from ${currentNote.source})`);
+          }
+        }
+      }
+
+      if (targetNote) assertFragmentExists(targetNote, fragment);
+    }
+
+    for (const child of node.children ?? []) walk(child);
+  }
+
+  walk(tree);
 }
 
 async function publishImage(target, alt, currentNote, context) {
@@ -334,11 +361,14 @@ async function transformChildren(parent, currentNote, context) {
           `Reference ${child.identifier} cannot be both a note link and an image`,
         );
       }
+      if (kinds.size === 0 && !isExternalUrl(child.url)) {
+        throw new Error(`Unused relative definition: ${child.identifier}`);
+      }
       if (child.url.startsWith("#") && child.url !== "#") {
         if (kinds.has("image")) {
           throw new Error(`Image reference ${child.identifier} cannot target a heading`);
         }
-        child.url = `#${assertFragmentExists(currentNote, child.url.slice(1))}`;
+        child.url = `#${normalizeFragment(child.url.slice(1))}`;
         continue;
       }
       if (isExternalUrl(child.url)) continue;
@@ -354,7 +384,7 @@ async function transformChildren(parent, currentNote, context) {
       continue;
     }
     if (child.type === "link" && child.url.startsWith("#") && child.url !== "#") {
-      const anchor = assertFragmentExists(currentNote, child.url.slice(1));
+      const anchor = normalizeFragment(child.url.slice(1));
       child.url = `#${anchor}`;
       await transformChildren(child, currentNote, context);
       continue;
@@ -391,7 +421,6 @@ export async function syncNotes({ repositoryDir, vaultDir }) {
       const metadata = validateMetadata(tree, note.source);
       parsedNotes.push({
         ...note,
-        headings: collectHeadingSlugs(tree),
         metadata,
         references: collectReferenceKinds(tree),
         tree,
@@ -402,8 +431,16 @@ export async function syncNotes({ repositoryDir, vaultDir }) {
     const notesBySource = new Map(parsedNotes.map((note) => [note.source, note]));
     const context = { notesBySource, outputRoot, vaultRoot };
     for (const note of parsedNotes) {
+      await transformChildren(note.tree, note, context);
+    }
+    for (const note of parsedNotes) {
+      note.headings = collectHeadingSlugs(note.tree);
+    }
+
+    const notesBySlug = new Map(parsedNotes.map((note) => [note.slug, note]));
+    for (const note of parsedNotes) {
       const { tree } = note;
-      await transformChildren(tree, note, context);
+      validateFinalFragments(tree, note, notesBySlug);
       const destination = join(outputRoot, "src/content/notes", `${note.slug}.md`);
       await mkdir(dirname(destination), { recursive: true });
       await writeFile(destination, serializer.stringify(tree));
