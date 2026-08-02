@@ -211,6 +211,16 @@ time {
   font-size: 0.85rem;
 }
 
+.note-search {
+  min-height: 3rem;
+  margin-top: 2rem;
+}
+
+pagefind-searchbox {
+  display: block;
+  width: 100%;
+}
+
 .backlinks {
   margin-top: 3rem;
   border-top: 1px solid var(--border);

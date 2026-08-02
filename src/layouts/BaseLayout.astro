@@ -5,6 +5,7 @@ interface Props {
   title?: string;
   description?: string;
   lang?: "en" | "zh-TW";
+  search?: boolean;
 }
 
 const siteTitle = "Yu-Sheng Li";
@@ -12,6 +13,7 @@ const {
   title,
   description = "Personal site and writing by Yu-Sheng Li.",
   lang = "en",
+  search = false,
 } = Astro.props;
 const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
 ---
@@ -23,6 +25,8 @@ const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{pageTitle}</title>
+    {search && <link href="/pagefind/pagefind-component-ui.css" rel="stylesheet" />}
+    {search && <script is:inline src="/pagefind/pagefind-component-ui.js" type="module"></script>}
   </head>
   <body>
     <div class="site-shell">

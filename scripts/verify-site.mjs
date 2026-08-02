@@ -13,10 +13,13 @@ const checks = [
     "blog/literature-survey-tool/index.html",
     ["Tools for literature survey", "/assets/images/literature-survey-tool/semantic-1.png"],
   ],
-  ["notes/index.html", ["Notes", "Public knowledge base", "發布公開筆記"]],
+  [
+    "notes/index.html",
+    ["Notes", "Public knowledge base", "發布公開筆記", "pagefind-searchbox"],
+  ],
   [
     "notes/public-knowledge-base/index.html",
-    ["Public knowledge base", "Backlinks", "發布公開筆記"],
+    ["Public knowledge base", "Backlinks", "發布公開筆記", "data-pagefind-body"],
   ],
   [
     "notes/publishing-public-notes/index.html",
@@ -32,6 +35,9 @@ const assets = [
   "assets/pdf/cv.pdf",
   "assets/images/literature-survey-tool/semantic-1.png",
   "images/404.jpg",
+  "pagefind/pagefind.js",
+  "pagefind/pagefind-component-ui.js",
+  "pagefind/pagefind-component-ui.css",
 ];
 
 function assertFile(path) {

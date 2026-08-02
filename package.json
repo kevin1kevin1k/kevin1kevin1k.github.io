@@ -7,7 +7,7 @@
     "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
     "build:cv": "node scripts/build-cv.mjs",
     "notes:sync": "node scripts/notes/sync-notes.mjs",
-    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build && pagefind --site dist --force-language zh",
     "preview": "astro preview",
     "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
     "test": "node --test",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "pagefind": "^1.5.2",
     "typescript": "^5.6.0"
   }
 }

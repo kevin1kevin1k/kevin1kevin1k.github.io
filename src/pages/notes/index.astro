@@ -1,5 +1,6 @@
 ---
 import NoteList from "../../components/NoteList.astro";
+import NoteSearch from "../../components/NoteSearch.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getNotes, getTagIndex } from "../../lib/notes";
 
@@ -7,11 +8,12 @@ const notes = await getNotes();
 const tags = [...getTagIndex(notes).values()].sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<BaseLayout title="Notes" description="A public, versioned knowledge base by Yu-Sheng Li.">
+<BaseLayout title="Notes" description="A public, versioned knowledge base by Yu-Sheng Li." search>
   <header class="page-header">
     <h1>Notes</h1>
     <p>A public, versioned knowledge base.</p>
   </header>
+  <NoteSearch />
   {
     tags.length > 0 && (
       <nav class="tag-navigation" aria-label="Browse notes by tag">
