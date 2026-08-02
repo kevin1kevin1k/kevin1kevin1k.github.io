@@ -60,21 +60,27 @@ test("builds backlinks from note links but ignores code examples", () => {
   assert.deepEqual(getBacklinks(notes, "other"), []);
 });
 
-test("builds backlinks from reference-style note links", () => {
+test("builds backlinks only from used reference-style note links", () => {
   const notes = [
     note(
       "source.md",
       "Source",
       `[Target][target]
 
+![Image][image]
+
 [target]: /notes/target/#details
+[image]: /notes/other/
+[unused]: /notes/other/
 `,
     ),
     note("target.md", "Target", "No outgoing links."),
+    note("other.md", "Other", "No outgoing links."),
   ];
 
   assert.deepEqual(
     getBacklinks(notes, "target").map((entry) => entry.data.title),
     ["Source"],
   );
+  assert.deepEqual(getBacklinks(notes, "other"), []);
 });
